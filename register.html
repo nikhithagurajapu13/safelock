@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - Register</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-card card">
+
+    <button class="secondary-btn" onclick="goBack()">
+      ← Back to Home
+    </button>
+
+    <h1>SafeLock</h1>
+    <h2>Create Account</h2>
+
+    <input
+      type="text"
+      id="username"
+      placeholder="Username"
+      required
+    >
+
+    <input
+      type="tel"
+      id="phone"
+      placeholder="Phone Number"
+      required
+    >
+
+    <button class="primary-btn" onclick="registerUser()">
+      Register
+    </button>
+
+    <p>
+      Already have an account?
+      <a href="login.html">Login</a>
+    </p>
+
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "index.html";
+    }
+
+    async function registerUser() {
+      const username = document.getElementById("username").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!username || !phone) {
+        alert("Please enter username and phone number");
+        return;
+      }
+
+      try {
+        const response = await fetch("http://127.0.0.1:5000/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            username,
+            phone
+          })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          localStorage.setItem("phone", phone);
+
+          window.location.href = "otp.html";
+        } else {
+          alert(data.message || "Registration failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend server");
+      }
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - Secure Digital Vault</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <header>
+    <div class="logo">SafeLock</div>
+
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="#" onclick="openProtectedPage('photos.html')">Photos</a>
+      <a href="#" onclick="openProtectedPage('videos.html')">Videos</a>
+      <a href="#" onclick="openProtectedPage('documents.html')">Documents</a>
+      <a href="register.html">Register</a>
+      <a href="login.html">Login</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-box">
+      <h1>Welcome to <span>SafeLock</span> – Secure Digital Vault</h1>
+
+      <p>
+        Store and encrypt your Photos, Videos & Documents securely
+      </p>
+
+      <div class="feature-grid">
+
+        <div class="feature-card card image-card"
+             onclick="openProtectedPage('photos.html')">
+          <div class="overlay"></div>
+
+          <div class="feature-content">
+            <i class="fa-solid fa-image"></i>
+            <h2>Photos</h2>
+            <p>Secure image storage with instant access</p>
+          </div>
+        </div>
+
+        <div class="feature-card card video-card"
+             onclick="openProtectedPage('videos.html')">
+          <div class="overlay"></div>
+
+          <div class="feature-content">
+            <i class="fa-solid fa-circle-play"></i>
+            <h2>Videos</h2>
+            <p>Encrypted video archive inside your vault</p>
+          </div>
+        </div>
+
+        <div class="feature-card card document-card"
+             onclick="openProtectedPage('documents.html')">
+          <div class="overlay"></div>
+
+          <div class="feature-content">
+            <i class="fa-solid fa-file-lines"></i>
+            <h2>Documents</h2>
+            <p>Protect PDF and DOC files securely</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="security-info">
+        <div>
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Privacy Focused</span>
+        </div>
+
+        <div>
+          <i class="fa-solid fa-cloud"></i>
+          <span>Encrypted Cloud Storage</span>
+        </div>
+
+        <div>
+          <i class="fa-solid fa-lock"></i>
+          <span>OTP Protected Login</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    function openProtectedPage(page) {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        localStorage.setItem("redirectAfterLogin", page);
+        window.location.href = "login.html";
+        return;
+      }
+
+      window.location.href = page;
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - Login</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body.auth-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:30px;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,170,.15), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0,140,255,.15), transparent 30%),
+        #0b1020;
+      color:#fff;
+    }
+
+    .auth-card{
+      width:100%;
+      max-width:460px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:30px;
+      padding:35px;
+      backdrop-filter:blur(18px);
+      box-shadow:0 20px 45px rgba(0,0,0,.35);
+    }
+
+    .back-btn{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      padding:12px 18px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:.95rem;
+      margin-bottom:30px;
+      transition:.25s ease;
+    }
+
+    .back-btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:2rem;
+      font-weight:700;
+      color:#00e3ab;
+      margin-bottom:10px;
+    }
+
+    .auth-card h2{
+      margin-bottom:10px;
+      font-size:1.7rem;
+    }
+
+    .auth-card p{
+      color:rgba(255,255,255,.7);
+      margin-bottom:28px;
+      line-height:1.5;
+    }
+
+    .input-group{
+      position:relative;
+      margin-bottom:22px;
+    }
+
+    .input-group i{
+      position:absolute;
+      left:16px;
+      top:50%;
+      transform:translateY(-50%);
+      color:rgba(255,255,255,.6);
+    }
+
+    .input-group input{
+      width:100%;
+      padding:15px 18px 15px 48px;
+      border:none;
+      outline:none;
+      border-radius:16px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-size:1rem;
+    }
+
+    .input-group input::placeholder{
+      color:rgba(255,255,255,.5);
+    }
+
+    .login-btn{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(135deg,#00e3ab,#00a8ff);
+      color:#fff;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s ease;
+      box-shadow:0 12px 28px rgba(0,227,171,.28);
+    }
+
+    .login-btn:hover{
+      transform:translateY(-3px);
+    }
+
+    .bottom-text{
+      margin-top:22px;
+      text-align:center;
+      color:rgba(255,255,255,.7);
+    }
+
+    .bottom-text a{
+      color:#00e3ab;
+      text-decoration:none;
+      font-weight:600;
+    }
+  </style>
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+
+    <button class="back-btn" onclick="goBack()">
+      <i class="fa-solid fa-arrow-left"></i> Back to Home
+    </button>
+
+    <div class="logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      SafeLock
+    </div>
+
+    <h2>Login with OTP</h2>
+    <p>
+      Enter your registered phone number. We'll send a one-time password
+      to securely access your SafeLock account.
+    </p>
+
+    <div class="input-group">
+      <i class="fa-solid fa-phone"></i>
+      <input
+        type="tel"
+        id="loginPhone"
+        placeholder="Enter registered phone number"
+      >
+    </div>
+
+    <button class="login-btn" onclick="sendOTP()">
+      <i class="fa-solid fa-paper-plane"></i>
+      Send OTP
+    </button>
+
+    <div class="bottom-text">
+      Don't have an account?
+      <a href="register.html">Register</a>
+    </div>
+
+  </div>
+
+  <script>
+    // clear old session whenever login page opens
+    sessionStorage.clear();
+
+    function goBack() {
+      window.location.href = "index.html";
+    }
+
+    async function sendOTP() {
+      const phone = document.getElementById("loginPhone").value.trim();
+
+      if (!phone) {
+        alert("Please enter your phone number");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/auth/login",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ phone })
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          sessionStorage.setItem("phone", phone);
+
+          // if backend already returns username/token save them also
+          if (data.username) {
+            sessionStorage.setItem("username", data.username);
+          }
+
+          if (data.token) {
+            sessionStorage.setItem("token", data.token);
+          }
+
+          window.location.href = "otp.html";
+        } else {
+          alert(data.message || "Login failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend server");
+      }
+    }
+  </script>
+
+</body>
+</html>

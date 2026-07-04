@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - Verify OTP</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body.auth-page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:30px;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,170,.15), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0,140,255,.15), transparent 30%),
+        #0b1020;
+      color:#fff;
+    }
+
+    .auth-card{
+      width:100%;
+      max-width:460px;
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:30px;
+      padding:35px;
+      backdrop-filter:blur(18px);
+      box-shadow:0 20px 45px rgba(0,0,0,.35);
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:2rem;
+      font-weight:700;
+      color:#00e3ab;
+      margin-bottom:12px;
+    }
+
+    .auth-card h2{
+      margin-bottom:10px;
+      font-size:1.7rem;
+    }
+
+    .auth-card p{
+      color:rgba(255,255,255,.7);
+      margin-bottom:28px;
+      line-height:1.5;
+    }
+
+    .input-group{
+      position:relative;
+      margin-bottom:22px;
+    }
+
+    .input-group i{
+      position:absolute;
+      left:16px;
+      top:50%;
+      transform:translateY(-50%);
+      color:rgba(255,255,255,.6);
+    }
+
+    .input-group input{
+      width:100%;
+      padding:15px 18px 15px 48px;
+      border:none;
+      outline:none;
+      border-radius:16px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:#fff;
+      font-size:1rem;
+      letter-spacing:4px;
+      text-align:center;
+    }
+
+    .input-group input::placeholder{
+      color:rgba(255,255,255,.5);
+      letter-spacing:normal;
+    }
+
+    .verify-btn{
+      width:100%;
+      padding:15px;
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(135deg,#00e3ab,#00a8ff);
+      color:#fff;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s ease;
+      box-shadow:0 12px 28px rgba(0,227,171,.28);
+    }
+
+    .verify-btn:hover{
+      transform:translateY(-3px);
+    }
+
+    .back-link{
+      margin-top:22px;
+      text-align:center;
+    }
+
+    .back-link a{
+      color:#00e3ab;
+      text-decoration:none;
+      font-weight:600;
+    }
+  </style>
+</head>
+<body class="auth-page">
+
+  <div class="auth-card">
+
+    <div class="logo">
+      <i class="fa-solid fa-shield-halved"></i>
+      SafeLock
+    </div>
+
+    <h2>Verify OTP</h2>
+
+    <p>
+      Enter the 6-digit OTP sent to your registered phone number
+      to continue securely.
+    </p>
+
+    <div class="input-group">
+      <i class="fa-solid fa-key"></i>
+      <input
+        type="text"
+        id="otp"
+        placeholder="Enter 6-digit OTP"
+        maxlength="6"
+      >
+    </div>
+
+    <button class="verify-btn" onclick="verifyOTP()">
+      <i class="fa-solid fa-check"></i>
+      Verify OTP
+    </button>
+
+    <div class="back-link">
+      <a href="login.html">← Back to Login</a>
+    </div>
+
+  </div>
+
+  <script>
+    const phone = sessionStorage.getItem("phone");
+
+    if (!phone) {
+      alert("Session expired. Please login again.");
+      window.location.href = "login.html";
+    }
+
+    async function verifyOTP() {
+      const otp = document.getElementById("otp").value.trim();
+
+      if (!otp) {
+        alert("Please enter OTP");
+        return;
+      }
+
+      if (otp.length !== 6) {
+        alert("OTP must be exactly 6 digits");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/auth/verify-otp",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              phone: phone,
+              otp: otp
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+          sessionStorage.setItem("phone", phone);
+          sessionStorage.setItem("token", data.token);
+          sessionStorage.setItem("userId", data.user._id);
+          sessionStorage.setItem("username", data.user.username);
+
+          alert("Login successful!");
+          window.location.href = "dashboard.html";
+        } else {
+          alert(data.message || "Invalid OTP");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend server");
+      }
+    }
+
+    document.getElementById("otp").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        verifyOTP();
+      }
+    });
+  </script>
+
+</body>
+</html>

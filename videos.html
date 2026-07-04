@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - My Videos</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      padding:40px 6%;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,170,.12), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(0,140,255,.14), transparent 30%),
+        #0a1020;
+      color:#fff;
+    }
+
+    .top-section{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:32px;
+    }
+
+    .page-title h1{
+      font-size:2.6rem;
+      color:#00e3ab;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .page-title p{
+      color:rgba(255,255,255,.7);
+    }
+
+    .top-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      outline:none;
+      padding:12px 18px;
+      border-radius:14px;
+      font-size:.95rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:.25s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      color:#fff;
+      text-decoration:none;
+    }
+
+    .btn:hover{
+      transform:translateY(-3px);
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,#00e3ab,#00a8ff);
+      box-shadow:0 10px 24px rgba(0,227,171,.25);
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+    }
+
+    .btn-danger{
+      background:rgba(255,77,109,.15);
+      color:#ff8ca0;
+      border:1px solid rgba(255,77,109,.3);
+    }
+
+    .glass-box{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px;
+      padding:28px;
+      backdrop-filter:blur(16px);
+      box-shadow:0 20px 45px rgba(0,0,0,.35);
+      margin-bottom:30px;
+    }
+
+    .upload-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .welcome-box h2{
+      font-size:1.5rem;
+      margin-bottom:8px;
+    }
+
+    .welcome-box p{
+      color:rgba(255,255,255,.7);
+    }
+
+    .upload-controls{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .custom-file{
+      position:relative;
+      overflow:hidden;
+      border-radius:14px;
+      padding:12px 18px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:#fff;
+    }
+
+    .custom-file input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
+
+    .video-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+      gap:24px;
+    }
+
+    .video-card{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:24px;
+      overflow:hidden;
+      transition:.3s ease;
+    }
+
+    .video-card:hover{
+      transform:translateY(-8px);
+      border-color:rgba(0,227,171,.4);
+      box-shadow:0 18px 35px rgba(0,0,0,.35);
+    }
+
+    .video-preview{
+      width:100%;
+      height:220px;
+      background:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:3rem;
+      color:#00e3ab;
+    }
+
+    .video-content{
+      padding:18px;
+    }
+
+    .video-name{
+      font-size:1rem;
+      font-weight:600;
+      margin-bottom:16px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .video-actions{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .empty-state{
+      text-align:center;
+      padding:50px 20px;
+      color:rgba(255,255,255,.75);
+    }
+
+    .empty-state i{
+      font-size:3.2rem;
+      color:#00e3ab;
+      margin-bottom:16px;
+    }
+
+    @media(max-width:768px){
+      .top-section,
+      .upload-row{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .video-actions{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-section">
+    <div class="page-title">
+      <h1><i class="fa-solid fa-video"></i> My Videos</h1>
+      <p>Upload, view and protect your personal video collection</p>
+    </div>
+
+    <div class="top-actions">
+      <button class="btn btn-secondary" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left"></i> Dashboard
+      </button>
+
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    async function uploadVideo() {
+      const fileInput = document.getElementById("videoFile");
+
+      if (!fileInput.files.length) {
+        alert("Please select a video");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      formData.append("fileType", "video");
+
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/files/upload",
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + token
+            },
+            body: formData
+          }
+        );
+
+        if (response.ok) {
+          alert("Video uploaded successfully");
+          loadVideos();
+        } else {
+          const data = await response.json();
+          alert(data.message || "Upload failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function deleteFile(id) {
+      if (!confirm("Delete this video?")) return;
+
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (response.ok) {
+          loadVideos();
+        } else {
+          alert("Delete failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function viewVideo(id) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/view/${id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (!response.ok) {
+          alert("Unable to open video");
+          return;
+        }
+
+        const blob = await response.blob();
+        const videoURL = URL.createObjectURL(blob);
+
+        window.open(videoURL, "_blank");
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function downloadVideo(id) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/download/${id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (!response.ok) {
+          alert("Download failed");
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function loadVideos() {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/files/my-files",
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        const files = await response.json();
+        const videoFiles = files.filter(file => file.fileType === "video");
+
+        let html = `
+          <div class="glass-box upload-row">
+            <div class="welcome-box">
+              <h2>Welcome, ${sessionStorage.getItem("username") || "User"}</h2>
+              <p>Choose a video file and upload it securely to SafeLock.</p>
+            </div>
+
+            <div class="upload-controls">
+              <label class="custom-file">
+                <i class="fa-solid fa-film"></i>
+                Choose Video
+                <input type="file" id="videoFile" accept="video/*">
+              </label>
+
+              <button class="btn btn-primary" onclick="uploadVideo()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Upload
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (videoFiles.length === 0) {
+          html += `
+            <div class="glass-box empty-state">
+              <i class="fa-solid fa-photo-film"></i>
+              <h2>No Videos Uploaded Yet</h2>
+              <p>Your secure video vault is empty. Upload your first video to begin.</p>
+            </div>
+          `;
+        } else {
+          html += `<div class="video-grid">`;
+
+          videoFiles.forEach(file => {
+            html += `
+              <div class="video-card">
+                <div class="video-preview">
+                  <i class="fa-solid fa-circle-play"></i>
+                </div>
+
+                <div class="video-content">
+                  <div class="video-name">${file.fileName}</div>
+
+                  <div class="video-actions">
+                    <button class="btn btn-primary" onclick="viewVideo('${file._id}')">
+                      View
+                    </button>
+
+                    <button class="btn btn-secondary" onclick="downloadVideo('${file._id}')">
+                      Download
+                    </button>
+
+                    <button class="btn btn-danger" onclick="deleteFile('${file._id}')">
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+
+        document.getElementById("result").innerHTML = html;
+      } catch (error) {
+        console.error(error);
+
+        document.getElementById("result").innerHTML = `
+          <div class="glass-box empty-state">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h2>Unable to Load Videos</h2>
+            <p>Please make sure your backend server is running.</p>
+          </div>
+        `;
+      }
+    }
+
+    loadVideos();
+  </script>
+</body>
+</html>

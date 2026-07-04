@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeLock - My Documents</title>
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      padding:40px 6%;
+      background:
+        radial-gradient(circle at top left, rgba(0,255,170,.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(0,132,255,.12), transparent 30%),
+        #0a1020;
+      color:#fff;
+    }
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+      margin-bottom:35px;
+    }
+
+    .title-box h1{
+      font-size:2.6rem;
+      color:#00e3ab;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:8px;
+    }
+
+    .title-box p{
+      color:rgba(255,255,255,.7);
+    }
+
+    .header-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:none;
+      outline:none;
+      padding:12px 18px;
+      border-radius:14px;
+      cursor:pointer;
+      font-size:.95rem;
+      font-weight:600;
+      transition:.25s;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      color:#fff;
+    }
+
+    .btn:hover{
+      transform:translateY(-3px);
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,#00e3ab,#00a8ff);
+      box-shadow:0 10px 25px rgba(0,227,171,.3);
+    }
+
+    .btn-secondary{
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.15);
+    }
+
+    .btn-danger{
+      background:rgba(255,77,109,.15);
+      border:1px solid rgba(255,77,109,.25);
+      color:#ff8ca0;
+    }
+
+    .glass-card{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:28px;
+      padding:28px;
+      backdrop-filter:blur(18px);
+      box-shadow:0 20px 45px rgba(0,0,0,.35);
+      margin-bottom:30px;
+    }
+
+    .upload-section{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .welcome-text h2{
+      margin-bottom:8px;
+      font-size:1.5rem;
+    }
+
+    .welcome-text p{
+      color:rgba(255,255,255,.7);
+    }
+
+    .upload-controls{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .file-input{
+      position:relative;
+      overflow:hidden;
+      padding:12px 18px;
+      border-radius:14px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      color:#fff;
+    }
+
+    .file-input input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
+
+    .documents-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:24px;
+    }
+
+    .document-card{
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:24px;
+      padding:24px;
+      transition:.3s;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .document-card:hover{
+      transform:translateY(-8px);
+      border-color:rgba(0,227,171,.4);
+      box-shadow:0 18px 35px rgba(0,0,0,.35);
+    }
+
+    .doc-icon{
+      width:70px;
+      height:70px;
+      border-radius:18px;
+      background:linear-gradient(135deg,#00e3ab,#00a8ff);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.8rem;
+      margin-bottom:18px;
+    }
+
+    .doc-name{
+      font-size:1rem;
+      font-weight:600;
+      margin-bottom:18px;
+      word-break:break-word;
+    }
+
+    .doc-actions{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+
+    .empty-state{
+      text-align:center;
+      padding:50px 20px;
+      color:rgba(255,255,255,.75);
+    }
+
+    .empty-state i{
+      font-size:3rem;
+      color:#00e3ab;
+      margin-bottom:16px;
+    }
+
+    @media(max-width:768px){
+      .top-bar,
+      .upload-section{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .doc-actions{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <div class="title-box">
+      <h1><i class="fa-solid fa-file-shield"></i> My Documents</h1>
+      <p>Store and manage your secure files and documents</p>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="goBack()">
+        <i class="fa-solid fa-arrow-left"></i> Dashboard
+      </button>
+
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </div>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    function goBack() {
+      window.location.href = "dashboard.html";
+    }
+
+    function logout() {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    async function uploadDocument() {
+      const fileInput = document.getElementById("documentFile");
+
+      if (!fileInput.files.length) {
+        alert("Please select a document");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", fileInput.files[0]);
+      formData.append("fileType", "document");
+
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/files/upload",
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + token
+            },
+            body: formData
+          }
+        );
+
+        if (response.ok) {
+          alert("Document uploaded successfully");
+          loadDocuments();
+        } else {
+          const data = await response.json();
+          alert(data.message || "Upload failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function deleteFile(id) {
+      if (!confirm("Delete this document?")) return;
+
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/${id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (response.ok) {
+          loadDocuments();
+        } else {
+          alert("Delete failed");
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function viewFile(id) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/view/${id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (!response.ok) {
+          alert("Unable to open document");
+          return;
+        }
+
+        const blob = await response.blob();
+        const fileURL = URL.createObjectURL(blob);
+
+        window.open(fileURL, "_blank");
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function downloadFile(id) {
+      try {
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/files/download/${id}`,
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        if (!response.ok) {
+          alert("Download failed");
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error(error);
+        alert("Cannot connect to backend");
+      }
+    }
+
+    async function loadDocuments() {
+      try {
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/files/my-files",
+          {
+            headers: {
+              Authorization: "Bearer " + token
+            }
+          }
+        );
+
+        const files = await response.json();
+        const documentFiles = files.filter(
+          file => file.fileType === "document"
+        );
+
+        let html = `
+          <div class="glass-card upload-section">
+            <div class="welcome-text">
+              <h2>Welcome, ${sessionStorage.getItem("username") || "User"}</h2>
+              <p>Select a PDF, DOC or DOCX file and upload it securely.</p>
+            </div>
+
+            <div class="upload-controls">
+              <label class="file-input">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                Choose Document
+                <input type="file" id="documentFile" accept=".pdf,.doc,.docx">
+              </label>
+
+              <button class="btn btn-primary" onclick="uploadDocument()">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                Upload
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (documentFiles.length === 0) {
+          html += `
+            <div class="glass-card empty-state">
+              <i class="fa-solid fa-folder-open"></i>
+              <h2>No Documents Uploaded Yet</h2>
+              <p>Upload your first secure document to begin.</p>
+            </div>
+          `;
+        } else {
+          html += `<div class="documents-grid">`;
+
+          documentFiles.forEach(file => {
+            html += `
+              <div class="document-card">
+                <div>
+                  <div class="doc-icon">
+                    <i class="fa-solid fa-file-lines"></i>
+                  </div>
+
+                  <div class="doc-name">${file.fileName}</div>
+                </div>
+
+                <div class="doc-actions">
+                  <button
+                    class="btn btn-primary"
+                    onclick="viewFile('${file._id}')"
+                  >
+                    View
+                  </button>
+
+                  <button
+                    class="btn btn-secondary"
+                    onclick="downloadFile('${file._id}')"
+                  >
+                    Download
+                  </button>
+
+                  <button
+                    class="btn btn-danger"
+                    onclick="deleteFile('${file._id}')"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            `;
+          });
+
+          html += `</div>`;
+        }
+
+        document.getElementById("result").innerHTML = html;
+      } catch (error) {
+        console.error(error);
+
+        document.getElementById("result").innerHTML = `
+          <div class="glass-card empty-state">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <h2>Unable to Load Documents</h2>
+            <p>Please make sure your backend server is running.</p>
+          </div>
+        `;
+      }
+    }
+
+    loadDocuments();
+  </script>
+</body>
+</html>
